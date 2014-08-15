@@ -4,6 +4,8 @@ module SpreeCashOnDelivery
     isolate_namespace Spree
     engine_name 'spree_cash_on_delivery'
 
+    config.autoload_paths += %W(#{config.root}/lib)
+
     # use rspec for tests
     config.generators do |g|
       g.test_framework :rspec
@@ -13,6 +15,11 @@ module SpreeCashOnDelivery
       Dir.glob(File.join(File.dirname(__FILE__), '../../app/**/*_decorator*.rb')) do |c|
         Rails.configuration.cache_classes ? require(c) : load(c)
       end
+    end
+
+    # Adds new payment method to payment methods array
+    initializer "spree.register.payment_methods" do |app|
+      app.config.spree.payment_methods << Spree::Gateway::CashOnDelivery
     end
 
     config.to_prepare &method(:activate).to_proc
